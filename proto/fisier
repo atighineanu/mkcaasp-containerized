@@ -1,0 +1,11 @@
+			 {
+				"AuthURL":"https://smtg:5000/v3",
+				"RegionName":"Region",
+				"ProjectName":"caasp",
+				"UserDomainName":"users",
+				"IdentityAPIVersion":"3",
+				"Interface":"public",
+				"Username":"user",
+				"Password":"3051206905fa205b618adc0342f7d65c",
+				"ProjectID":"00000000000000000000000000"
+			 }
