@@ -24,7 +24,7 @@ func VelumUpdater(nodes *CAASPOut) {
 	t := time.Now()
 	hosts := len(nodes.IPMastersExt.Value) + len(nodes.IPWorkersExt.Value)
 	driver := agouti.ChromeDriver(
-		agouti.ChromeOptions("args", []string{"--no-sandbox"}), //[]string{"--headless", "--disable-gpu", "--no-sandbox"}
+		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}), //[]string{"--headless", "--disable-gpu", "--no-sandbox"}
 	)
 	if err := driver.Start(); err != nil {
 		log.Fatal(err)
@@ -64,6 +64,8 @@ func VelumUpdater(nodes *CAASPOut) {
 	if err := page.Find(".reboot-update-btn").Click(); err != nil {
 		log.Fatal(err)
 	}
+
+	time.Sleep(100 * time.Second)
 
 	for {
 		out, er := AdminOrchCmd(nodes, "refresh", "")
@@ -114,7 +116,7 @@ func CreateAcc(nodes *CAASPOut) {
 	}()
 	//driver := agouti.ChromeDriver()
 	driver := agouti.ChromeDriver(
-	//agouti.ChromeOptions("args", []string{"--no-sandbox"}), //[]string{"--headless", "--disable-gpu", "--no-sandbox"}
+		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}), //[]string{"--headless", "--disable-gpu", "--no-sandbox"}
 	)
 	if err := driver.Start(); err != nil {
 		log.Fatal(err)
@@ -305,7 +307,7 @@ func InstallUI(nodes *CAASPOut, Cluster *CaaSPCluster) {
 		log.Println("Adding nodes to the cluster...")
 	}()
 	driver := agouti.ChromeDriver(
-		agouti.ChromeOptions("args", []string{"--no-sandbox"}), // "--disable-gpu"   "--headless"
+		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}), // "--disable-gpu"   "--headless"
 	)
 	if err := driver.Start(); err != nil {
 		log.Fatal(err)

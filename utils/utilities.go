@@ -39,6 +39,7 @@ func SetOSEnv(file string) (EnvOS, error) {
 		"OS_USERNAME=" + auth.Username,
 		"OS_PASSWORD=" + auth.Password, //Dehashinator("./../", "./"),    auth.Password,
 		"OS_PROJECT_ID=" + auth.ProjectID,
+		"OS_INSECURE=" + auth.Insecure, //strconv.FormatBool(auth.Insecure),
 	}
 	ENV = env
 	return env, nil
@@ -46,7 +47,7 @@ func SetOSEnv(file string) (EnvOS, error) {
 
 func (s *CAASPOut) SSHCommand(cmd ...string) *exec.Cmd {
 	arg := append(
-		[]string{"-o", "StrictHostKeyChecking=no",
+		[]string{"-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile /dev/null", "-i", "/app/caasp-openstack-terraform/id_caasp",
 			fmt.Sprintf("root@%s", s.IPAdminExt.Value),
 		},
 		cmd...,
@@ -265,7 +266,7 @@ func NodesAdder(dir string, append string, nodes *CAASPOut, Firsttime bool) *Caa
 // RunScript accepts 4 inputs and a runs terraform script
 func RunScript(command string, env EnvOS) (string, string) {
 	var stdoutBuf, stderrBuf bytes.Buffer
-	cmd := exec.Command("bash", "-c", command)
+	cmd := exec.Command("/bin/sh", "-c", command)
 	newEnv := append(os.Environ(), env...)
 	cmd.Env = newEnv
 
