@@ -5,14 +5,16 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"mkcaasp/utils"
 	"os"
 	"strings"
+
+	"../utils"
 )
 
 const (
-	command  = "terraform %s -var auth_url=$OS_AUTH_URL -var domain_name=$OS_USER_DOMAIN_NAME -var region_name=$OS_REGION_NAME -var project_name=$OS_PROJECT_NAME -var user_name=$OS_USERNAME -var password=$OS_PASSWORD -var-file=terraform.tfvars -auto-approve"
-	howtouse = `
+	command              = "terraform %s -var auth_url=$OS_AUTH_URL -var domain_name=$OS_USER_DOMAIN_NAME -var region_name=$OS_REGION_NAME -var project_name=$OS_PROJECT_NAME -var user_name=$OS_USERNAME -var password=$OS_PASSWORD -var-file=terraform.tfvars -auto-approve"
+	openstackcommandopts = "%s -var auth_url=$OS_AUTH_URL -var domain_name=$OS_USER_DOMAIN_NAME -var region_name=$OS_REGION_NAME -var project_name=$OS_PROJECT_NAME -var user_name=$OS_USERNAME -var password=$OS_PASSWORD -var-file=terraform.tfvars"
+	howtouse             = `
 			 Make sure you have terraform installed and in $PATH
 			 git clone https://github.com/kubic-project/automation.git
 			 
@@ -103,7 +105,14 @@ func main() {
 	}
 	os.Chdir(*home)
 	if *ostkcmd != "" {
-		out1, out2 := utils.CmdRun(caaspDir, *openstack, *ostkcmd)
+		out, _ := utils.CmdRun(caaspDir, *openstack, output)
+		a := utils.CAASPOut{}
+		err := json.Unmarshal([]byte(out), &a)
+		if err != nil {
+			log.Fatal(err)
+		}
+		utils.TfInit(caaspDir)
+		out1, out2 := utils.CmdRun(caaspDir, *openstack, fmt.Sprintf(openstackcommandopts, *ostkcmd))
 		fmt.Printf("%s\n  %s\n", out1, out2)
 	}
 	os.Chdir(*home)
@@ -119,7 +128,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if *nodes == "" {
+		if *nodes == "" && a.IPAdminExt == nil {
 			*nodes = "m1w2"
 		}
 		Cluster = utils.NodesAdder(caaspDir, *nodes, &a, true)
