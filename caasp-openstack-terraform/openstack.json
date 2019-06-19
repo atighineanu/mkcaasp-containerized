@@ -1,0 +1,12 @@
+{
+ "AuthURL": "https://engcloud.prv.suse.net:5000/v3",
+ "RegionName": "CustomRegion",
+ "ProjectName": "container",
+ "UserDomainName": "ldap_users",
+ "IdentityAPIVersion": "3",
+ "Interface": "public",
+ "Username": "<<your username>>",
+ "Password": "<<your password>>",
+ "ProjectID": "<<your project ID hash>>",
+  "Insecure": "true"
+}
