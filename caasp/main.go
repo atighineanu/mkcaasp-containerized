@@ -5,11 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"mkcaasp/tests"
 	"os"
 	"strings"
 	"time"
 
+	"../tests"
 	"../utils"
 )
 
