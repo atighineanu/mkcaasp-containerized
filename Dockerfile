@@ -16,4 +16,5 @@ RUN apk add gcc
 RUN apk add go
 RUN apk add git
 RUN go get github.com/sclevine/agouti
+Run mv /app/openstack.json /app/caasp-openstack-terraform/openstack.json
 RUN go build -o mkcaasp caasp/*.go

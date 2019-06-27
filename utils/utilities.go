@@ -294,7 +294,7 @@ func NodesAdder(dir string, append string, nodes *CAASPOut, Firsttime bool) *Caa
 // RunScript accepts 4 inputs and a runs terraform script
 func RunScript(command string, env EnvOS) (string, string) {
 	var stdoutBuf, stderrBuf bytes.Buffer
-	cmd := exec.Command("bash", "-c", command)
+	cmd := exec.Command("sh", "-c", command)
 	newEnv := append(os.Environ(), env...)
 	cmd.Env = newEnv
 
