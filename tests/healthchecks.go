@@ -2,8 +2,9 @@ package tests
 
 import (
 	"log"
-	"mkcaasp/utils"
 	"strings"
+
+	"../utils"
 )
 
 func HealthChecks(a *utils.CAASPOut, homedir string, caaspdir string) {
