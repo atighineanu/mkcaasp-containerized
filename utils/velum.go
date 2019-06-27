@@ -20,11 +20,11 @@ const (
 	passwd = "123456789"
 )
 
-func VelumUpdater(nodes *CAASPOut) {
+func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 	t := time.Now()
 	hosts := len(nodes.IPMastersExt.Value) + len(nodes.IPWorkersExt.Value)
 	driver := agouti.ChromeDriver(
-		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}), //[]string{"--headless", "--disable-gpu", "--no-sandbox"}
+		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}),
 	)
 	if err := driver.Start(); err != nil {
 		log.Fatal(err)
@@ -65,26 +65,38 @@ func VelumUpdater(nodes *CAASPOut) {
 		log.Fatal(err)
 	}
 
+	log.Printf("Updating Admin for %2.2f seconds now...", time.Since(t).Seconds())
 	time.Sleep(100 * time.Second)
 
+	velumURL := fmt.Sprintf("https://%s.nip.io", nodes.IPAdminExt.Value)
+	log.Printf("Velum warm up time: %2.2f Seconds\n", CheckVelumUp(velumURL))
+
 	for {
-		out, er := AdminOrchCmd(nodes, "refresh", "")
+		time.Sleep(10 * time.Second)
+		out, er := AdminOrchCmd(homedir, caaspdir, nodes, "refresh", "")
 		if !strings.Contains(er, "nil") {
 			fmt.Printf("%s\n%s\n", out, er)
 		} else {
 			fmt.Printf("%s\n", out)
 		}
-		time.Sleep(2 * time.Second)
-		if err := page.Find(".reboot-update-btn"); err != nil {
-			if err := page.Find("#update-all-nodes").Click(); err == nil {
-				break
-			}
+
+		time.Sleep(time.Duration(10*hosts) * time.Second)
+
+		if err := page.Find("#update-all-nodes").Click(); err == nil {
+			break
 		}
+
 		time.Sleep(5 * time.Second)
 		go func() {
 			log.Printf("Updating Admin for %2.2f seconds now...", time.Since(t).Seconds())
 		}()
 	}
+
+	/*	err = page.Navigate(fmt.Sprintf("https://%v.%s/update", nodes.IPAdminExt.Value, domain)) //https://10.86.4.11.nip.io/update
+		if err != nil {
+			log.Fatalf("Error at clicking update the rest nodes:  %s", err)
+		}
+	*/
 
 	for {
 		page.Session().SetImplicitWait(30 * 1000)
@@ -103,7 +115,7 @@ func VelumUpdater(nodes *CAASPOut) {
 			}
 		}
 		go func() {
-			log.Printf("Updating cluster for %2.2f seconds now", time.Since(t).Seconds())
+			log.Printf("Retrying updating cluster for %2.2f seconds now", time.Since(t).Seconds())
 		}()
 		time.Sleep(20 * time.Second)
 	}
@@ -307,7 +319,7 @@ func InstallUI(nodes *CAASPOut, Cluster *CaaSPCluster) {
 		log.Println("Adding nodes to the cluster...")
 	}()
 	driver := agouti.ChromeDriver(
-		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}), // "--disable-gpu"   "--headless"
+		agouti.ChromeOptions("args", []string{"--no-sandbox", "--disable-gpu", "--headless"}),
 	)
 	if err := driver.Start(); err != nil {
 		log.Fatal(err)
