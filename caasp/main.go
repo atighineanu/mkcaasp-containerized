@@ -242,6 +242,8 @@ func main() {
 	os.Chdir(*home)
 	if *new {
 		utils.AdminOrchCmd(*home, caaspDir, utils.CAASPOutReturner(*openstack, *home, caaspDir), "new", utils.RegCode) // <<----------- unexistent variable! put your SCC regcode here!!!!!
+		time.Sleep(30 * time.Second)
+		utils.CheckSaltMinions(*home, caaspDir)
 	}
 	os.Chdir(*home)
 	if *uiupd {

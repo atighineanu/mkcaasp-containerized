@@ -24,11 +24,12 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 	t := time.Now()
 	hosts := len(nodes.IPMastersExt.Value) + len(nodes.IPWorkersExt.Value)
 	driver := agouti.ChromeDriver(
-		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}),
+		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}), //"--headless", "--disable-gpu",
 	)
 	if err := driver.Start(); err != nil {
 		log.Fatal(err)
 	}
+
 	page, err := driver.NewPage(agouti.Browser("chrome"))
 	if err != nil {
 		log.Fatal(err)
@@ -53,26 +54,45 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 	if err := page.Find(".btn-block").Click(); err != nil {
 		log.Fatal(err)
 	}
-	time.Sleep(4 * time.Second)
 
 	//-----------------UPDATE ADMIN NODE
-	if err := page.Find(".update-admin-btn").Click(); err != nil {
-		log.Fatal(err)
+	for {
+		time.Sleep(time.Duration(10*hosts) * time.Second)
+		out, err1 := AdminOrchCmd(homedir, caaspdir, nodes, "refresh", "")
+		if !strings.Contains(err1, "nil") {
+			fmt.Printf("%s\n%s\n", out, err1)
+		} else {
+			fmt.Printf("%s\n", out)
+		}
+		if count, _ := page.Find(".update-admin-btn").Count(); count > 0 {
+			log.Println("Clicking now \"Update Admin\"...")
+			if err := page.Find(".update-admin-btn").Click(); err != nil {
+				log.Fatal(err)
+				go func() {
+					page.Find(".update-admin-btn").Click()
+				}()
+			}
+			go func() {
+				page.Find(".update-admin-btn").Click()
+			}()
+			time.Sleep(2 * time.Second)
+			break
+		}
 	}
-	time.Sleep(2 * time.Second)
+
+	time.Sleep(5 * time.Second)
 	//---------------Reboot to update
 	if err := page.Find(".reboot-update-btn").Click(); err != nil {
 		log.Fatal(err)
 	}
 
 	log.Printf("Updating Admin for %2.2f seconds now...", time.Since(t).Seconds())
-	time.Sleep(100 * time.Second)
-
+	time.Sleep(30 * time.Second)
 	velumURL := fmt.Sprintf("https://%s.nip.io", nodes.IPAdminExt.Value)
 	log.Printf("Velum warm up time: %2.2f Seconds\n", CheckVelumUp(velumURL))
 
 	for {
-		time.Sleep(10 * time.Second)
+		time.Sleep(time.Duration(10*hosts) * time.Second)
 		out, er := AdminOrchCmd(homedir, caaspdir, nodes, "refresh", "")
 		if !strings.Contains(er, "nil") {
 			fmt.Printf("%s\n%s\n", out, er)
@@ -80,23 +100,29 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 			fmt.Printf("%s\n", out)
 		}
 
-		time.Sleep(time.Duration(10*hosts) * time.Second)
+		page.Refresh()
+		time.Sleep(time.Duration(30*hosts) * time.Second)
 
-		if err := page.Find("#update-all-nodes").Click(); err == nil {
+		if count, _ := page.Find("#update-all-nodes").Count(); count > 0 {
+			log.Println("Clicking now \"Update All Nodes\"...")
+			err := page.Find("#update-all-nodes").Click()
+			if err != nil {
+				log.Printf("error: %s", err)
+				go func() {
+					page.Find("#update-all-nodes").Click()
+				}()
+			}
+			go func() {
+				page.Find("#update-all-nodes").Click()
+			}()
 			break
 		}
 
 		time.Sleep(5 * time.Second)
 		go func() {
-			log.Printf("Updating Admin for %2.2f seconds now...", time.Since(t).Seconds())
+			log.Printf("Updating the rest of nodes %2.2f seconds now...", time.Since(t).Seconds())
 		}()
 	}
-
-	/*	err = page.Navigate(fmt.Sprintf("https://%v.%s/update", nodes.IPAdminExt.Value, domain)) //https://10.86.4.11.nip.io/update
-		if err != nil {
-			log.Fatalf("Error at clicking update the rest nodes:  %s", err)
-		}
-	*/
 
 	for {
 		page.Session().SetImplicitWait(30 * 1000)
