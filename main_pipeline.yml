@@ -3,7 +3,8 @@
 # fly -t tutorial sp -p YOUR_PIPELINE_TITLE -c main_pipeline.yml \
 #     -v repo=your_update_repo \
 #     -v user=registryusername \
-#     -v password=yourpassword -n
+#     -v password=yourpassword \
+#     -v docker_repository=repository -n
 resources:
   - name: tf-cfg-state
     type: git
@@ -16,7 +17,7 @@ resources:
     source:
       username: ((user))
       password: ((password))
-      repository: fgerling/pipeline
+      repository: ((docker_repository))
       tag: latest
 
 jobs:
