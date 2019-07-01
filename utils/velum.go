@@ -26,7 +26,7 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 	driver := agouti.ChromeDriver(
 		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}), //"--headless", "--disable-gpu",
 	)
-	time.Sleep(200*time.Second)
+	time.Sleep(200 * time.Second)
 	if err := driver.Start(); err != nil {
 		log.Fatal(err)
 	}
@@ -56,6 +56,7 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 		log.Fatal(err)
 	}
 	//-----------------UPDATE ADMIN NODE
+	time.Sleep(200 * time.Second)
 	for {
 		time.Sleep(time.Duration(10*hosts) * time.Second)
 		out, err1 := AdminOrchCmd(homedir, caaspdir, nodes, "refresh", "")
@@ -70,7 +71,7 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 		}
 	}
 
-	time.Sleep(time.Duration(10*hosts)*time.Second)
+	time.Sleep(time.Duration(10*hosts) * time.Second)
 	log.Println("Clicking now \"Update Admin\"...")
 	if err := page.Find(".update-admin-btn").Click(); err != nil {
 		log.Fatal(err)
@@ -83,11 +84,12 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 	}
 
 	log.Printf("Updating Admin for %2.2f seconds now...", time.Since(t).Seconds())
-	time.Sleep(30 * time.Second)
+	time.Sleep(100 * time.Second)
 	velumURL := fmt.Sprintf("https://%s.nip.io", nodes.IPAdminExt.Value)
 	log.Printf("Velum warm up time: %2.2f Seconds\n", CheckVelumUp(velumURL))
 
 	for {
+		log.Printf("Updating Cluster for %2.2f seconds now...", time.Since(t).Seconds())
 		time.Sleep(time.Duration(10*hosts) * time.Second)
 		out, er := AdminOrchCmd(homedir, caaspdir, nodes, "refresh", "")
 		if !strings.Contains(er, "nil") {
@@ -95,6 +97,7 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 		} else {
 			fmt.Printf("%s\n", out)
 		}
+		log.Printf("Updating Cluster for %2.2f seconds now...", time.Since(t).Seconds())
 
 		page.Refresh()
 		time.Sleep(time.Duration(30*hosts) * time.Second)
@@ -120,7 +123,12 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 		}()
 	}
 
+	retries := 0
 	for {
+		if retries > 5 {
+			log.Println("Sorry...something went wrong with the cluster")
+			break
+		}
 		page.Session().SetImplicitWait(30 * 1000)
 		selection := page.All(".fa-check-circle-o, .fa-times-circle")
 		count, _ := selection.Count()
@@ -140,6 +148,7 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 			log.Printf("Retrying updating cluster for %2.2f seconds now", time.Since(t).Seconds())
 		}()
 		time.Sleep(20 * time.Second)
+		retries++
 	}
 	page.CloseWindow()
 }
