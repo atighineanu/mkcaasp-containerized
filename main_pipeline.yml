@@ -20,7 +20,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 
@@ -39,7 +39,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 
@@ -59,7 +59,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 
@@ -80,7 +80,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 
@@ -100,7 +100,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 
@@ -125,7 +125,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 
@@ -144,7 +144,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 
@@ -164,7 +164,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 
@@ -184,7 +184,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 
@@ -205,7 +205,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 
@@ -225,7 +225,7 @@ jobs:
             type: docker-image
             source:
               username: shaklotan
-              password: <<megapasswd>>
+              password: <<your_docker_megapasswd>>
               repository: shaklotan/mkcaasp-spawner
               tag: latest
 

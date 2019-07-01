@@ -26,6 +26,7 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 	driver := agouti.ChromeDriver(
 		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}), //"--headless", "--disable-gpu",
 	)
+	time.Sleep(200*time.Second)
 	if err := driver.Start(); err != nil {
 		log.Fatal(err)
 	}
@@ -54,7 +55,6 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 	if err := page.Find(".btn-block").Click(); err != nil {
 		log.Fatal(err)
 	}
-
 	//-----------------UPDATE ADMIN NODE
 	for {
 		time.Sleep(time.Duration(10*hosts) * time.Second)
@@ -65,19 +65,15 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 			fmt.Printf("%s\n", out)
 		}
 		if count, _ := page.Find(".update-admin-btn").Count(); count > 0 {
-			log.Println("Clicking now \"Update Admin\"...")
-			if err := page.Find(".update-admin-btn").Click(); err != nil {
-				log.Fatal(err)
-				go func() {
-					page.Find(".update-admin-btn").Click()
-				}()
-			}
-			go func() {
-				page.Find(".update-admin-btn").Click()
-			}()
 			time.Sleep(2 * time.Second)
 			break
 		}
+	}
+
+	time.Sleep(time.Duration(10*hosts)*time.Second)
+	log.Println("Clicking now \"Update Admin\"...")
+	if err := page.Find(".update-admin-btn").Click(); err != nil {
+		log.Fatal(err)
 	}
 
 	time.Sleep(5 * time.Second)
