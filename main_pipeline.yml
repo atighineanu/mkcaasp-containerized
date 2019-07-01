@@ -1,0 +1,239 @@
+---
+resources:
+  - name: tf-cfg-state
+    type: git
+    source:
+      uri: https://github.com/atighineanu/TFCFGs.git
+      branch: master
+jobs:
+  - name: "ScenarioI(Updating all at once: SCC + TestPackage)"
+    public: true
+    serial: true
+    plan:
+      - get: tf-cfg-state
+      - task: CaaSP_Openstack_Terraform_Spawning
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: tf-cfg-state
+            
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/megarunner.sh
+
+      - task: CaaSP_Bootstrap&Tiller_Velum
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: tf-cfg-state
+            - name: some-files
+
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/megalister.sh
+
+      - task: CaaSP_Cluster_Registration_Update
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: some-files
+            - name: tf-cfg-state
+            
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/megaupdater.sh
+            args: [((repo))]
+
+      - task: CaaSP_Cluster_Running_HealthChecks
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: some-files
+            - name: tf-cfg-state
+            
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/healthchecks.sh
+
+      - task: CaaSP_Destroy
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: tf-cfg-state
+            - name: some-files
+
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/megakiller.sh
+
+  - name: "ScenarioI(Updating separately: 1st - SCC; 2nd - TestPackage)"
+    public: true
+    serial: true
+    plan:
+      - get: tf-cfg-state
+      - task: CaaSP_Openstack_Terraform_Spawning
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: tf-cfg-state
+            
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/megarunner.sh
+
+      - task: CaaSP_Bootstrap&Tiller_Velum
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: tf-cfg-state
+            - name: some-files
+
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/megalister.sh
+
+      - task: CaaSP_Cluster_Registration_Update_SCC
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: some-files
+            - name: tf-cfg-state
+            
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/megaupdaterII.sh
+
+      - task: CaaSP_Cluster_Update_The_Package
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: some-files
+            - name: tf-cfg-state
+            
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/updatethepackage.sh
+            args: [((repo))]
+
+      - task: CaaSP_Cluster_Running_HealthChecks
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: some-files
+            - name: tf-cfg-state
+            
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/healthchecks.sh
+
+      - task: CaaSP_Destroy
+        config:
+          platform: linux
+          image_resource: 
+            type: docker-image
+            source:
+              username: shaklotan
+              password: <<megapasswd>>
+              repository: shaklotan/mkcaasp-spawner
+              tag: latest
+
+          inputs:
+            - name: tf-cfg-state
+            - name: some-files
+
+          outputs:
+            - name: some-files
+          run:
+            path: tf-cfg-state/scripts/megakiller.sh
+
+      
