@@ -1,4 +1,6 @@
 ---
+#HOW IT IS RUN:
+# fly -t tutorial sp -p YOUR_PIPELINE_TITLE -c main_pipeline.yml -v repo=your_update_repo -n
 resources:
   - name: tf-cfg-state
     type: git
