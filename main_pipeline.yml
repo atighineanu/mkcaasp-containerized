@@ -46,7 +46,6 @@ jobs:
 
           inputs:
             - name: tf-cfg-state
-            
           outputs:
             - name: some-files
           run:
@@ -59,7 +58,6 @@ jobs:
           inputs:
             - name: tf-cfg-state
             - name: some-files
-
           outputs:
             - name: some-files
           run:
@@ -84,7 +82,6 @@ jobs:
           inputs:
             - name: some-files
             - name: tf-cfg-state
-            
           outputs:
             - name: some-files
           run:
@@ -110,7 +107,6 @@ jobs:
           inputs:
             - name: some-files
             - name: tf-cfg-state
-            
           outputs:
             - name: some-files
           run:
@@ -135,7 +131,6 @@ jobs:
           inputs:
             - name: tf-cfg-state
             - name: some-files
-
           outputs:
             - name: some-files
           run:
@@ -178,7 +173,6 @@ jobs:
           platform: linux
           inputs:
             - name: tf-cfg-state
-            
           outputs:
             - name: some-files
           run:
@@ -191,7 +185,6 @@ jobs:
           inputs:
             - name: tf-cfg-state
             - name: some-files
-
           outputs:
             - name: some-files
           run:
@@ -216,7 +209,6 @@ jobs:
           inputs:
             - name: some-files
             - name: tf-cfg-state
-            
           outputs:
             - name: some-files
           run:
@@ -241,7 +233,6 @@ jobs:
           inputs:
             - name: some-files
             - name: tf-cfg-state
-            
           outputs:
             - name: some-files
           run:
@@ -267,7 +258,6 @@ jobs:
           inputs:
             - name: some-files
             - name: tf-cfg-state
-            
           outputs:
             - name: some-files
           run:
@@ -292,7 +282,6 @@ jobs:
           inputs:
             - name: tf-cfg-state
             - name: some-files
-
           outputs:
             - name: some-files
           run:
