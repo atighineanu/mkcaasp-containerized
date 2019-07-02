@@ -28,6 +28,18 @@ jobs:
       - get: tf-cfg-state
       - get: container_mkcaasp
       - task: CaaSP_Openstack_Terraform_Spawning
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
         image: container_mkcaasp
         config:
           platform: linux
@@ -52,6 +64,18 @@ jobs:
             - name: some-files
           run:
             path: tf-cfg-state/scripts/megalister.sh
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
 
       - task: CaaSP_Cluster_Registration_Update
         image: container_mkcaasp
@@ -66,6 +90,18 @@ jobs:
           run:
             path: tf-cfg-state/scripts/megaupdater.sh
             args: [((repo))]
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
 
       - task: CaaSP_Cluster_Running_HealthChecks
         image: container_mkcaasp
@@ -79,6 +115,18 @@ jobs:
             - name: some-files
           run:
             path: tf-cfg-state/scripts/healthchecks.sh
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
 
       - task: CaaSP_Destroy
         image: container_mkcaasp
@@ -92,6 +140,18 @@ jobs:
             - name: some-files
           run:
             path: tf-cfg-state/scripts/megakiller.sh
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
 
   - name: "ScenarioI(Updating separately: SCC then TestPackage)"
     public: true
@@ -100,6 +160,19 @@ jobs:
       - get: tf-cfg-state
       - get: container_mkcaasp
       - task: CaaSP_Openstack_Terraform_Spawning
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
+
         image: container_mkcaasp
         config:
           platform: linux
@@ -123,6 +196,18 @@ jobs:
             - name: some-files
           run:
             path: tf-cfg-state/scripts/megalister.sh
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
 
       - task: CaaSP_Cluster_Registration_Update_SCC
         image: container_mkcaasp
@@ -136,6 +221,18 @@ jobs:
             - name: some-files
           run:
             path: tf-cfg-state/scripts/megaupdaterII.sh
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
 
       - task: CaaSP_Cluster_Update_The_Package
         image: container_mkcaasp
@@ -150,6 +247,18 @@ jobs:
           run:
             path: tf-cfg-state/scripts/updatethepackage.sh
             args: [((repo))]
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
 
       - task: CaaSP_Cluster_Running_HealthChecks
         image: container_mkcaasp
@@ -163,6 +272,18 @@ jobs:
             - name: some-files
           run:
             path: tf-cfg-state/scripts/healthchecks.sh
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
 
       - task: CaaSP_Destroy
         image: container_mkcaasp
@@ -176,5 +297,15 @@ jobs:
             - name: some-files
           run:
             path: tf-cfg-state/scripts/megakiller.sh
-
-      
+        on_failure:
+            task: CaaSP_Destroy
+            image: container_mkcaasp
+            config:
+              platform: linux
+              inputs:
+                - name: tf-cfg-state
+                - name: some-files
+              outputs:
+                - name: some-files
+              run:
+                path: tf-cfg-state/scripts/megakiller.sh
