@@ -26,11 +26,9 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 	driver := agouti.ChromeDriver(
 		agouti.ChromeOptions("args", []string{"--headless", "--disable-gpu", "--no-sandbox"}), //"--headless", "--disable-gpu",
 	)
-	time.Sleep(200 * time.Second)
 	if err := driver.Start(); err != nil {
 		log.Fatal(err)
 	}
-
 	page, err := driver.NewPage(agouti.Browser("chrome"))
 	if err != nil {
 		log.Fatal(err)
@@ -55,41 +53,11 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 	if err := page.Find(".btn-block").Click(); err != nil {
 		log.Fatal(err)
 	}
+	time.Sleep(4 * time.Second)
+
 	//-----------------UPDATE ADMIN NODE
-	time.Sleep(200 * time.Second)
+	tries := 0
 	for {
-		time.Sleep(time.Duration(10*hosts) * time.Second)
-		out, err1 := AdminOrchCmd(homedir, caaspdir, nodes, "refresh", "")
-		if !strings.Contains(err1, "nil") {
-			fmt.Printf("%s\n%s\n", out, err1)
-		} else {
-			fmt.Printf("%s\n", out)
-		}
-		if count, _ := page.Find(".update-admin-btn").Count(); count > 0 {
-			time.Sleep(2 * time.Second)
-			break
-		}
-	}
-
-	time.Sleep(time.Duration(10*hosts) * time.Second)
-	log.Println("Clicking now \"Update Admin\"...")
-	if err := page.Find(".update-admin-btn").Click(); err != nil {
-		log.Fatal(err)
-	}
-
-	time.Sleep(5 * time.Second)
-	//---------------Reboot to update
-	if err := page.Find(".reboot-update-btn").Click(); err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("Updating Admin for %2.2f seconds now...", time.Since(t).Seconds())
-	time.Sleep(100 * time.Second)
-	velumURL := fmt.Sprintf("https://%s.nip.io", nodes.IPAdminExt.Value)
-	log.Printf("Velum warm up time: %2.2f Seconds\n", CheckVelumUp(velumURL))
-
-	for {
-		log.Printf("Updating Cluster for %2.2f seconds now...", time.Since(t).Seconds())
 		time.Sleep(time.Duration(10*hosts) * time.Second)
 		out, er := AdminOrchCmd(homedir, caaspdir, nodes, "refresh", "")
 		if !strings.Contains(er, "nil") {
@@ -97,7 +65,44 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 		} else {
 			fmt.Printf("%s\n", out)
 		}
-		log.Printf("Updating Cluster for %2.2f seconds now...", time.Since(t).Seconds())
+		page.Refresh()
+
+		for {
+			if count, _ := page.Find(".update-admin-btn").Count(); count > 0 {
+				log.Println("Clicking now \"Update Admin\"...")
+				if err := page.Find(".update-admin-btn").Click(); err != nil {
+					log.Fatal(err)
+				}
+				break
+			}
+		}
+
+		//---------------Reboot to update
+		if err := page.Find(".reboot-update-btn").Click(); err != nil {
+			log.Fatal(err)
+		}
+		velumURL := fmt.Sprintf("https://%s.nip.io", nodes.IPAdminExt.Value)
+		timesince := CheckVelumUp(velumURL)
+		log.Printf("Velum warm up time: %2.2f Seconds\n", timesince)
+		if timesince > float64(2.00) || tries >= 3 {
+			break
+		}
+		tries++
+		time.Sleep(30 * time.Second)
+	}
+
+	log.Printf("Updating Admin for %2.2f seconds now...", time.Since(t).Seconds())
+	velumURL := fmt.Sprintf("https://%s.nip.io", nodes.IPAdminExt.Value)
+	log.Printf("Velum warm up time: %2.2f Seconds\n", CheckVelumUp(velumURL))
+
+	for {
+		time.Sleep(time.Duration(10*hosts) * time.Second)
+		out, er := AdminOrchCmd(homedir, caaspdir, nodes, "refresh", "")
+		if !strings.Contains(er, "nil") {
+			fmt.Printf("%s\n%s\n", out, er)
+		} else {
+			fmt.Printf("%s\n", out)
+		}
 
 		page.Refresh()
 		time.Sleep(time.Duration(30*hosts) * time.Second)
@@ -107,13 +112,7 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 			err := page.Find("#update-all-nodes").Click()
 			if err != nil {
 				log.Printf("error: %s", err)
-				go func() {
-					page.Find("#update-all-nodes").Click()
-				}()
 			}
-			go func() {
-				page.Find("#update-all-nodes").Click()
-			}()
 			break
 		}
 
@@ -123,16 +122,12 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 		}()
 	}
 
-	retries := 0
 	for {
-		if retries > 5 {
-			log.Println("Sorry...something went wrong with the cluster")
-			break
-		}
 		page.Session().SetImplicitWait(30 * 1000)
 		selection := page.All(".fa-check-circle-o, .fa-times-circle")
 		count, _ := selection.Count()
 		if count >= hosts {
+			log.Printf("SUCCESS! Cluster updated & orchestrated in: %2.2f seconds", time.Since(t).Seconds())
 			break
 		} else {
 			selection := page.All(".fa-arrow-circle-up")
@@ -145,10 +140,9 @@ func VelumUpdater(homedir string, caaspdir string, nodes *CAASPOut) {
 			}
 		}
 		go func() {
-			log.Printf("Retrying updating cluster for %2.2f seconds now", time.Since(t).Seconds())
+			log.Printf("Retrying/updating cluster for %2.2f seconds now", time.Since(t).Seconds())
 		}()
 		time.Sleep(20 * time.Second)
-		retries++
 	}
 	page.CloseWindow()
 }
